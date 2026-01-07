@@ -6,7 +6,7 @@ public class Position {
     private int col;
 
     public Position(int row, int col) {
-        if (row < 0 || col < 0 || row > maxRow || col > maxCol) {
+        if (row < 0 || col < -1 || row > maxRow || col > maxCol) {
             throw new IllegalArgumentException(
                     "Invalid Position: row=" + row + ", col=" + col
             );
