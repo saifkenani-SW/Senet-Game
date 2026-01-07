@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class State {
-    private final Cell[][] board = Board.getInstance().getCells();
+    private static final Cell[][] board = Board.getInstance().getCells();
     private Map<Position, Player> players = new HashMap<>();
     private Player currentPlayer;
     private int throwingResult;
@@ -21,6 +21,12 @@ public class State {
             players.put(position, currentPlayer);
             switchPlayer();
         }
+    }
+
+    public State(State state) {
+        this.currentPlayer = state.currentPlayer;
+        this.throwingResult = state.throwingResult;
+        this.players = new HashMap<>(state.players);
     }
 
     public void switchPlayer() {
