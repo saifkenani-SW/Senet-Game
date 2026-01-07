@@ -28,8 +28,28 @@ public class State {
     }
 
     public boolean checkWinning() {
-        for (Map.Entry<Position, Player> entry : players.entrySet()) {
-            if (entry.getValue() == currentPlayer) {
+        for (Player player : players.values()) {
+            if (player == currentPlayer) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public Player getWinner() {
+        if (checkWinningForPlayer(Player.CPU)) {
+            return Player.CPU;
+        }
+        if (checkWinningForPlayer(Player.HUMAN)) {
+            return Player.HUMAN;
+        }
+        return null;
+    }
+
+    private boolean checkWinningForPlayer(Player player) {
+        for (Player p : players.values()) {
+            if (p == player) {
                 return false;
             }
         }
