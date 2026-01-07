@@ -40,6 +40,15 @@ public class Position {
     }
 
 
+    public Position nextPosition(int steps) {
+        Position current = this;
+
+        for (int i = 0; i < steps; i++) {
+            current = current.nextOne();
+        }
+        return current;
+    }
+
     private Position nextOne() {
         if (row == 0) {
             return col == 9
@@ -55,6 +64,7 @@ public class Position {
 
         return new Position(2, col + 1);
     }
+
 
 
 }
