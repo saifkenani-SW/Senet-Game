@@ -1,7 +1,7 @@
 package game;
 
 public class Position {
-    final int max_x = 2, max_y = 9;
+    private final int max_x = 2, max_y = 9;
     private int x;
     private int y;
 
