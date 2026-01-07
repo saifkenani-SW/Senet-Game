@@ -4,12 +4,13 @@ import logic.Throwing;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class State {
     private static final Cell[][] board = Board.getInstance().getCells();
     private Map<Position, Player> players = new HashMap<>();
     private Player currentPlayer;
-    private int throwingResult;
+   // private int throwingResult;
 
 
     public State() {
@@ -25,7 +26,7 @@ public class State {
 
     public State(State state) {
         this.currentPlayer = state.currentPlayer;
-        this.throwingResult = state.throwingResult;
+     //   this.throwingResult = state.throwingResult;
         this.players = new HashMap<>(state.players);
     }
 
@@ -67,11 +68,31 @@ public class State {
     }
 
 
-    public int getThrowingResult() {
-        return throwingResult;
+   /* public int getThrowingResult() {
+       return throwingResult;
+    }*/
+
+   /* public void setThrowingResult() {
+        this.throwingResult = Throwing.getInstance().getResult();
+    }*/
+
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        State state = (State) object;
+        return currentPlayer == state.currentPlayer
+                && players.equals(state.players);
     }
 
-    public void setThrowingResult() {
-        this.throwingResult = Throwing.getInstance().getResult();
+    @Override
+    public int hashCode() {
+        int result = currentPlayer.hashCode();
+        result = 31 * result + players.hashCode();
+        return result;
     }
+
+
 }
