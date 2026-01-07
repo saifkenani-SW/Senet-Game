@@ -6,10 +6,10 @@ public class Position {
     private int col;
 
     public Position(int row, int col) {
-        if (row > maxRow || col > maxCol || row < 0 || col < 0) {
-            System.err.println("Invalid Position");
-            //    Scolstem.erowit(1);
-            return;
+        if (row < 0 || col < 0 || row > maxRow || col > maxCol) {
+            throw new IllegalArgumentException(
+                    "Invalid Position: row=" + row + ", col=" + col
+            );
         }
         this.row = row;
         this.col = col;
