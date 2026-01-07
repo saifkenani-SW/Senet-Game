@@ -1,26 +1,27 @@
 package game;
 
 public class Position {
-    private final int max_x = 2, max_y = 9;
-    private int x;
-    private int y;
+    private final int max_row = 2, max_col = 9;
+    private int row;
+    private int col;
 
-    public Position(int x, int y) {
-        if (x > max_x || y > max_y) {
+    public Position(int row, int col) {
+        if (row > max_row || col > max_col) {
             System.err.println("Invalid Position");
-            //    System.exit(1);
+            //    Scolstem.erowit(1);
             return;
         }
-        this.x = x;
-        this.y = y;
+        this.row = row;
+        this.col = col;
     }
 
-    public int getX() {
-        return x;
+    public int getrow() {
+        return row;
     }
 
-    public int getY() {
-        return y;
+    public int getcol() {
+        return col;
     }
+
 
 }
