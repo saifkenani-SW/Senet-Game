@@ -1,12 +1,16 @@
 package game;
 
+import logic.Throwing;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class State {
     private final Cell[][] board = Board.getInstance().getCells();
-    Map<Position, Player> players = new HashMap<>();
-    Player currentPlayer;
+    private Map<Position, Player> players = new HashMap<>();
+    private Player currentPlayer;
+    private int throwingResult;
+
 
     public State() {
         currentPlayer = Player.CPU;
@@ -57,4 +61,11 @@ public class State {
     }
 
 
+    public int getThrowingResult() {
+        return throwingResult;
+    }
+
+    public void setThrowingResult() {
+        this.throwingResult = Throwing.getInstance().getResult();
+    }
 }
