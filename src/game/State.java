@@ -26,4 +26,15 @@ public class State {
                 ? Player.PLAYER2 : Player.PLAYER1;*/
 
     }
+
+    public boolean checkWinning() {
+        for (Map.Entry<Position, Player> entry : players.entrySet()) {
+            if (entry.getValue() == currentPlayer) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }
