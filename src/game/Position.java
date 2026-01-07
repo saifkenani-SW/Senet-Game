@@ -1,5 +1,7 @@
 package game;
 
+import java.util.Objects;
+
 public class Position {
     private final int maxRow = 2, maxCol = 9;
     private int row;
@@ -89,6 +91,19 @@ public class Position {
             return position.nextPositionRec(step - 1);
         }
 
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Position position = (Position) object;
+        return row == position.row && col == position.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col);
     }
 
 
