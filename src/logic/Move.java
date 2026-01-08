@@ -41,10 +41,18 @@ public class Move {
 
     public boolean canMove(Map<Position, Player> players, Position position, int step) {
         Position to = position.nextPosition(step);
+        if (hasSamePlayer(players, position, to)) return false;
         if (!CHECK_POINTCell(position, to)) return false;
         if (!TREECell(position, to)) return false;
         if (!TOWCell(position, to)) return false;
         return true;
+    }
+
+    private boolean hasSamePlayer(Map<Position, Player> players,
+                                  Position from,
+                                  Position to) {
+        return players.containsKey(to)
+                && players.get(from) == players.get(to);
     }
 
     private boolean CHECK_POINTCell(Position from, Position to) {
