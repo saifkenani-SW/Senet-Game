@@ -90,6 +90,10 @@ public class State {
         return piecePositions;
     }
 
+    public void skipRole() {
+        switchPlayer();
+    }
+
     public List<State> getNextStates(int step) {
         List<State> nextStates = new ArrayList<>();
         Move move = new Move();
