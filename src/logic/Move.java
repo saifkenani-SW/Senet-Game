@@ -24,6 +24,7 @@ public class Move {
         Position to = position.nextPosition(step);
 
         if (!CHECK_POINTCell(position, to)) return false;
+        if (!TREECell(position, to)) return false;
         return true;
     }
 
@@ -35,6 +36,15 @@ public class Move {
         return !(from.getIndex() < index && to.getIndex() > index);
     }
 
+    private boolean TREECell(Position from, Position to) {
+        int index = Type.TREE.getIndex();
+        /*if (from.getIndex() == index && to.getIndex() != 31)
+            return false;
+        return true;*/
+        return !(from.getIndex() == index && to.getIndex() != 31);
+    }
+
+    }
 
 
 }
