@@ -30,6 +30,14 @@ public class Play {
             int throwingResult = scanner.nextInt();
             System.out.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
 
+            if (state.getSizeofNextStates(throwingResult) == 0) {
+                System.err.println("You should skip your role !!!!");
+                System.err.println("You role have been skipped!");
+                state.skipRole();
+                continue;
+            }
+
+
             List<Position> positions = state.getCurrentPlayerPieces();
 
 
