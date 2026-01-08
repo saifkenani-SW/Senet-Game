@@ -28,8 +28,8 @@ public class Move {
         }
 
         if (players.containsKey(to)) {
-            Player other = players.get(to);
-            players.put(from, players.get(to));
+            Player other = state.otherPlayer();
+            players.put(from, other);
         }
 
         players.put(to, currentPlayer);
