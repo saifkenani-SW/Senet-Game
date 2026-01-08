@@ -20,7 +20,7 @@ public class Board {
                 if (i == 1 && j == 5)
                     cells[i][j] = new Cell(Type.NEW_BEGINNING);
                 else if (i == 2 && j == 5)
-                    cells[i][j] = new Cell(Type.INSPECTION);
+                    cells[i][j] = new Cell(Type.CHECK_POINT);
                 else if (i == 2 && j == 6)
                     cells[i][j] = new Cell(Type.RETURN);
                 else if (i == 2 && j == 7)
