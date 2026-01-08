@@ -8,7 +8,7 @@ public class Position {
     private int col;
 
     public Position(int row, int col) {
-        if (row < 0 || col < -1 || row > maxRow || col > maxCol) {
+        if (row < 0 || col < -1 || row > maxRow || col > maxCol + 5) {
             throw new IllegalArgumentException(
                     "Invalid Position: row=" + row + ", col=" + col
             );
@@ -95,6 +95,15 @@ public class Position {
             return position.nextPositionRec(step - 1);
         }
 
+    }
+
+
+    public int getIndex() {
+        return row * 10 + col + 1;
+    }
+
+    private boolean isOut(Position to) {
+        return to.getIndex() > 30;
     }
 
     @Override

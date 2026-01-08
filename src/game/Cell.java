@@ -11,13 +11,3 @@ public class Cell {
         return type;
     }
 }
-
-enum Type {
-    NORMAL,
-    NEW_BEGINNING,
-    INSPECTION,
-    RETURN,
-    TREE,
-    TOW,
-    FREEDOM;
-}
