@@ -102,8 +102,8 @@ public class Position {
         return row * 10 + col + 1;
     }
 
-    private boolean isOut(Position to) {
-        return to.getIndex() > 30;
+    public boolean isOut() {
+        return getIndex() > 30;
     }
 
     @Override
