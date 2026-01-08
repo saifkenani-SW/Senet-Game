@@ -21,8 +21,18 @@ public class Move {
     }
 
     public boolean canMove(Position position, int step) {
+        Position to = position.nextPosition(step);
 
+        if (!CHECK_POINTCell(position, to)) return false;
         return true;
+    }
+
+    private boolean CHECK_POINTCell(Position from, Position to) {
+        int index = Type.CHECK_POINT.getIndex();
+        /*if (from.getIndex() < index && to.getIndex() > index)
+            return false;
+        return true;*/
+        return !(from.getIndex() < index && to.getIndex() > index);
     }
 
 
