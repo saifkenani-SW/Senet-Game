@@ -26,7 +26,7 @@ public class Board {
                 else if (i == 2 && j == 7)
                     cells[i][j] = new Cell(Type.TREE);
                 else if (i == 2 && j == 8)
-                    cells[i][j] = new Cell(Type.TREE);
+                    cells[i][j] = new Cell(Type.TOW);
                 else if (i == 2 && j == 9)
                     cells[i][j] = new Cell(Type.FREEDOM);
                 else
