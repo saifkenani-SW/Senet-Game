@@ -2,6 +2,8 @@ package logic;
 
 import game.*;
 
+import java.util.Map;
+
 public class Move {
 
     public Move() {
@@ -9,20 +11,36 @@ public class Move {
 
 
     public State move(State current, Position position, int step) {
-        if (!canMove(position, step)) {
-            return null;
-        }
         State state = new State(current);
+
+        if (!canMove(state.getPlayers(), position, step)) {
+            return current;
+        }
+        Map<Position, Player> players = state.getPlayers();
+        Player currentPlayer = state.getCurrentPlayer();
         Position from = new Position(position);
         Position to = new Position(position.nextPosition(step));
+
+        players.remove(from);
+        if (to.isOut()) {
+            state.switchPlayer();
+            return state;
+        }
+
+        if (players.containsKey(to)) {
+            Player other = players.get(to);
+            players.put(from, players.get(to));
+        }
+
+        players.put(to, currentPlayer);
+        state.switchPlayer();
 
 
         return state;
     }
 
-    public boolean canMove(Position position, int step) {
+    public boolean canMove(Map<Position, Player> players, Position position, int step) {
         Position to = position.nextPosition(step);
-
         if (!CHECK_POINTCell(position, to)) return false;
         if (!TREECell(position, to)) return false;
         if (!TOWCell(position, to)) return false;
