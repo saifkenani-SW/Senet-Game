@@ -25,14 +25,10 @@ public class Play {
                 System.err.println("Winner: " + winner + "!");
                 return state;
             }
-
-            System.out.println("\n" + "=".repeat(40));
-            System.err.println("Player role : " + state.getCurrentPlayer());
-
-            int throwingResult = throwing.getResult();
-            System.err.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
-
             System.out.println("\n" + state.toString());
+            System.out.println("Enter your step: ");
+            int throwingResult = scanner.nextInt();
+            System.out.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
 
             List<Position> positions = state.getCurrentPlayerPieces();
 
@@ -46,7 +42,7 @@ public class Play {
             System.out.print("\n enter the number of part");
             int choice = scanner.nextInt();
             if (choice < 1 || choice > positions.size()) {
-                System.out.println("Invalid choice");
+                System.err.println("Invalid choice");
                 continue;
             }
 
@@ -54,7 +50,7 @@ public class Play {
 
             if (!move.canMove(state.getPlayers(), selectedPosition, throwingResult)) {
                 System.err.println("You can not move it now!");
-                System.out.println("Try again");
+                System.err.println("Try again");
                 continue;
             }
 //save player for "Try again"
