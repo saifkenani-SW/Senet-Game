@@ -29,10 +29,11 @@ public class Play {
             System.out.println("\n" + "=".repeat(40));
             System.err.println("Player role : " + state.getCurrentPlayer());
 
-            int throwingResult = throwing.getResult();
-            System.err.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
 
             System.out.println("\n" + state.toString());
+            System.out.println("Enter your step: ");
+            int throwingResult = scanner.nextInt();
+            System.out.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
 
             List<Position> positions = state.getCurrentPlayerPieces();
 
