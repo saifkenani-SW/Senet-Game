@@ -96,12 +96,25 @@ public class State {
         for (Map.Entry<Position, Player> entry : players.entrySet()) {
             if (entry.getValue() == currentPlayer) {
                 Position position = entry.getKey();
-                if (move.canMove(getPlayers(), position, step)) {
+                if (move.canMove(getPlayers(), entry.getKey(), step)) {
                     nextStates.add(move.move(this, position, step));
                 }
             }
         }
         return nextStates;
+    }
+
+    public int getSizeofNextStates(int step) {
+        int size = 0;
+        Move move = new Move();
+        for (Map.Entry<Position, Player> entry : players.entrySet()) {
+            if (entry.getValue() == currentPlayer) {
+                if (move.canMove(getPlayers(), entry.getKey(), step)) {
+                    size++;
+                }
+            }
+        }
+        return size;
     }
 
 
