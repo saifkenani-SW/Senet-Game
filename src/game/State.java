@@ -10,8 +10,16 @@ public class State {
     private static final Cell[][] board = Board.getInstance().getCells();
     private Map<Position, Player> players = new HashMap<>();
     private Player currentPlayer;
-   // private int throwingResult;
+    // private int throwingResult;
 
+
+    public Map<Position, Player> getPlayers() {
+        return players;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
 
     public State() {
         currentPlayer = Player.CPU;
@@ -26,7 +34,7 @@ public class State {
 
     public State(State state) {
         this.currentPlayer = state.currentPlayer;
-     //   this.throwingResult = state.throwingResult;
+        //   this.throwingResult = state.throwingResult;
         this.players = new HashMap<>(state.players);
     }
 
@@ -36,6 +44,11 @@ public class State {
         /*currentPlayer = (currentPlayer == Player.PLAYER1)
                 ? Player.PLAYER2 : Player.PLAYER1;*/
 
+    }
+
+    public Player otherPlayer() {
+        return (currentPlayer == Player.CPU)
+                ? Player.HUMAN : Player.CPU;
     }
 
     public boolean checkWinning() {
