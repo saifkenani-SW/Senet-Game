@@ -90,6 +90,20 @@ public class State {
         return piecePositions;
     }
 
+    public List<State> getNextStates(int step) {
+        List<State> nextStates = new ArrayList<>();
+        Move move = new Move();
+        for (Map.Entry<Position, Player> entry : players.entrySet()) {
+            if (entry.getValue() == currentPlayer) {
+                Position position = entry.getKey();
+                if (move.canMove(getPlayers(), position, step)) {
+                    nextStates.add(move.move(this, position, step));
+                }
+            }
+        }
+        return nextStates;
+    }
+
 
    /* public int getThrowingResult() {
        return throwingResult;
