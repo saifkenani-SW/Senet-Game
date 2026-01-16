@@ -13,10 +13,10 @@ public class Move {
     public State move(State current, Position position, int step) {
         State state = new State(current);
 
-        if (!canMove(state.getPlayers(), position, step)) {
+        if (!canMove(state.getPiece(), position, step)) {
             return current;
         }
-        Map<Position, Player> players = state.getPlayers();
+        Map<Position, Piece> players = state.getPiece();
         Player currentPlayer = state.getCurrentPlayer();
         Position from = new Position(position);
         Position to = new Position(position.nextPosition(step));
@@ -38,25 +38,25 @@ public class Move {
         }
 
         if (players.containsKey(to)) {
-            Player other = state.otherPlayer();
+            Player other = state.getOtherPlayer();
             players.remove(to);
-            players.put(from, other);
+            players.put(from, other.getPiece());
             if (to.getIndex() < 20) {
-                players.put(to, currentPlayer);
+                players.put(to, currentPlayer.getPiece());
                 handleState(state);
             } else {
                 handleState(state);
-                players.put(to, currentPlayer);
+                players.put(to, currentPlayer.getPiece());
             }
         } else {
             if (to.getIndex() < 20) {
                 players.remove(from);
-                players.put(to, currentPlayer);
+                players.put(to, currentPlayer.getPiece());
                 handleState(state);
             } else {
                 players.remove(from);
                 handleState(state);
-                players.put(to, currentPlayer);
+                players.put(to, currentPlayer.getPiece());
             }
         }
         state.switchPlayer();
@@ -66,7 +66,7 @@ public class Move {
     }
 
     private void handleState(State current) {
-        Map<Position, Player> players = current.getPlayers();
+        Map<Position, Piece> pieceMap = current.getPiece();
         Player currentPlayer = current.getCurrentPlayer();
         //  Position position_RETURN = new Position(2, 6);
         Position position_TREE = new Position(2, 7);
@@ -80,38 +80,38 @@ public class Move {
         }*/
 
 
-        if (players.containsKey(position_TREE)
-                && players.get(position_TREE).equals(currentPlayer)
+        if (pieceMap.containsKey(position_TREE)
+                && pieceMap.get(position_TREE).equals(currentPlayer.getPiece())
         ) {
-            returnTo_NEW_BEGINNING(players, position_TREE);
+            returnTo_NEW_BEGINNING(pieceMap, position_TREE);
         }
 
 
-        if (players.containsKey(position_TOW)
-                && players.get(position_TOW).equals(currentPlayer)
+        if (pieceMap.containsKey(position_TOW)
+                && pieceMap.get(position_TOW).equals(currentPlayer.getPiece())
         ) {
-            returnTo_NEW_BEGINNING(players, position_TOW);
+            returnTo_NEW_BEGINNING(pieceMap, position_TOW);
         }
 
-        if (players.containsKey(position_FREEDOM)
-                && players.get(position_FREEDOM).equals(currentPlayer)
+        if (pieceMap.containsKey(position_FREEDOM)
+                && pieceMap.get(position_FREEDOM).equals(currentPlayer.getPiece())
         ) {
-            returnTo_NEW_BEGINNING(players, position_FREEDOM);
+            returnTo_NEW_BEGINNING(pieceMap, position_FREEDOM);
         }
 
 
     }
 
-    public void returnTo_NEW_BEGINNING(Map<Position, Player> playerMap, Position position) {
+    public void returnTo_NEW_BEGINNING(Map<Position, Piece> pieceMap, Position position) {
         Position newBeginningPosition = new Position(1, 5);
-        Player owner = playerMap.get(position);
+        Piece owner = pieceMap.get(position);
 
-        while (playerMap.containsKey(newBeginningPosition)) {
+        while (pieceMap.containsKey(newBeginningPosition)) {
             newBeginningPosition = newBeginningPosition.previosPosition();
             System.err.println("PRE POSITION :" + newBeginningPosition.getRow() + " , " + newBeginningPosition.getCol());
         }
-        playerMap.remove(position);
-        playerMap.put(newBeginningPosition, owner);
+        pieceMap.remove(position);
+        pieceMap.put(newBeginningPosition, owner);
 
     }
 
@@ -128,21 +128,22 @@ public class Move {
     }*/
 
 
-    public boolean canMove(Map<Position, Player> players, Position position, int step) {
+    public boolean canMove(Map<Position, Piece> pieceMap, Position position, int step) {
+        if (!pieceMap.containsKey(position)) return false;
         Position to = position.nextPosition(step);
-        if (hasSamePlayer(players, position, to)) return false;
+        if (hasSamePiece(pieceMap, position, to)) return false;
         if (skip_CHECK_POINTCell(position, to)) return false;
-        if (cantFrom_CHECK_POINTCell(position, to)) return false;
+        // if (cantFrom_CHECK_POINTCell(position, to)) return false;
         if (cantFrom_TREECell(position, to)) return false;
         if (cantFrom_TOWCell(position, to)) return false;
         return true;
     }
 
-    private boolean hasSamePlayer(Map<Position, Player> players,
-                                  Position from,
-                                  Position to) {
-        return players.containsKey(to)
-                && players.get(from) == players.get(to);
+    private boolean hasSamePiece(Map<Position, Piece> pieceMap,
+                                 Position from,
+                                 Position to) {
+        return pieceMap.containsKey(to)
+                && pieceMap.get(from) == pieceMap.get(to);
     }
 
     private boolean skip_CHECK_POINTCell(Position from, Position to) {
