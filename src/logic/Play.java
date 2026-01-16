@@ -56,7 +56,7 @@ public class Play {
 
             Position selectedPosition = positions.get(choice - 1);
 
-            if (!move.canMove(state.getPlayers(), selectedPosition, throwingResult)) {
+            if (!move.canMove(state.getPiece(), selectedPosition, throwingResult)) {
                 System.err.println("You can not move it now!");
                 System.err.println("Try again");
                 continue;
