@@ -128,6 +128,13 @@ public class State {
         return size;
     }
 
+    public int evaluation() {
+        int evaluation = 0;
+
+        return evaluation;
+    }
+
+
 
    /* public int getThrowingResult() {
        return throwingResult;
