@@ -7,13 +7,13 @@ import java.util.*;
 
 public class State {
     private static final Cell[][] board = Board.getInstance().getCells();
-    private Map<Position, Player> players = new HashMap<>();
+    private Map<Position, Piece> pieceMap = new HashMap<>();
     private Player currentPlayer;
     // private int throwingResult;
 
 
-    public Map<Position, Player> getPlayers() {
-        return players;
+    public Map<Position, Piece> getPiece() {
+        return pieceMap;
     }
 
     public Player getCurrentPlayer() {
@@ -21,12 +21,13 @@ public class State {
     }
 
     public State() {
-        currentPlayer = Player.CPU;
+        currentPlayer = Player.PLAYER1;
         Position position = new Position(0, -1);
         int numberPieces = 14;
         for (int i = 0; i < numberPieces; i++) {
             position = position.nextPosition(1);
-            players.put(position, currentPlayer);
+            pieceMap.put(position, currentPlayer.getPiece());
+
             switchPlayer();
         }
     }
@@ -34,45 +35,51 @@ public class State {
     public State(State state) {
         this.currentPlayer = state.currentPlayer;
         //   this.throwingResult = state.throwingResult;
-        this.players = new HashMap<>(state.players);
+        this.pieceMap = new HashMap<>(state.pieceMap);
     }
 
     public void switchPlayer() {
-        currentPlayer = (currentPlayer == Player.CPU)
-                ? Player.HUMAN : Player.CPU;
-        /*currentPlayer = (currentPlayer == Player.PLAYER1)
-                ? Player.PLAYER2 : Player.PLAYER1;*/
+       /* currentPlayer = (currentPlayer == Player.CPU)
+                ? Player.HUMAN : Player.CPU;*/
+        currentPlayer = (currentPlayer == Player.PLAYER1)
+                ? Player.PLAYER2 : Player.PLAYER1;
 
     }
 
-    public Player otherPlayer() {
-        return (currentPlayer == Player.CPU)
-                ? Player.HUMAN : Player.CPU;
+    public Player getOtherPlayer() {
+        return (currentPlayer == Player.PLAYER1)
+                ? Player.PLAYER2 : Player.PLAYER1;
     }
 
     public boolean checkWinning() {
-        for (Player player : players.values()) {
-            if (player == currentPlayer) {
+        for (Piece piece : pieceMap.values()) {
+            if (piece == currentPlayer.getPiece()) {
                 return false;
             }
         }
+       /* for (Piece piece : pieceMap.values()) {
+            if (piece == getOtherPlayer().getPiece()) {
+                return false;
+            }
+        }*/
+
         return true;
     }
 
 
     public Player getWinner() {
-        if (checkWinningForPlayer(Player.CPU)) {
-            return Player.CPU;
+        if (checkWinningForPlayer(Player.PLAYER1)) {
+            return Player.PLAYER1;
         }
-        if (checkWinningForPlayer(Player.HUMAN)) {
-            return Player.HUMAN;
+        if (checkWinningForPlayer(Player.PLAYER2)) {
+            return Player.PLAYER2;
         }
         return null;
     }
 
     private boolean checkWinningForPlayer(Player player) {
-        for (Player p : players.values()) {
-            if (p == player) {
+        for (Piece piece : pieceMap.values()) {
+            if (piece == player.getPiece()) {
                 return false;
             }
         }
@@ -82,8 +89,8 @@ public class State {
     public List<Position> getCurrentPlayerPieces() {
         List<Position> piecePositions = new ArrayList<>();
 
-        for (Map.Entry<Position, Player> entry : players.entrySet()) {
-            if (entry.getValue() == currentPlayer) {
+        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
+            if (entry.getValue() == currentPlayer.getPiece()) {
                 piecePositions.add(entry.getKey());
             }
         }
@@ -97,10 +104,10 @@ public class State {
     public List<State> getNextStates(int step) {
         List<State> nextStates = new ArrayList<>();
         Move move = new Move();
-        for (Map.Entry<Position, Player> entry : players.entrySet()) {
-            if (entry.getValue() == currentPlayer) {
+        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
+            if (entry.getValue() == currentPlayer.getPiece()) {
                 Position position = entry.getKey();
-                if (move.canMove(getPlayers(), entry.getKey(), step)) {
+                if (move.canMove(pieceMap, entry.getKey(), step)) {
                     nextStates.add(move.move(this, position, step));
                 }
             }
@@ -111,9 +118,9 @@ public class State {
     public int getSizeofNextStates(int step) {
         int size = 0;
         Move move = new Move();
-        for (Map.Entry<Position, Player> entry : players.entrySet()) {
-            if (entry.getValue() == currentPlayer) {
-                if (move.canMove(getPlayers(), entry.getKey(), step)) {
+        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
+            if (entry.getValue() == currentPlayer.getPiece()) {
+                if (move.canMove(pieceMap, entry.getKey(), step)) {
                     size++;
                 }
             }
@@ -136,8 +143,8 @@ public class State {
 
         sb.append("\n==================== SENET GAME ====================\n\n");
         sb.append("Current Player : ").append(currentPlayer).append("\n");
-        sb.append("CPU Pieces     : ").append(countPieces(Player.CPU)).append("\n");
-        sb.append("HUMAN Pieces   : ").append(countPieces(Player.HUMAN)).append("\n\n");
+        sb.append("CPU Pieces     : ").append(countPieces(Player.PLAYER1)).append("\n");
+        sb.append("HUMAN Pieces   : ").append(countPieces(Player.PLAYER2)).append("\n\n");
 
 
         sb.append(renderBoard());
@@ -183,8 +190,8 @@ public class State {
         Position pos = new Position(row, col);
 
         // قطعة لاعب
-        if (players.containsKey(pos)) {
-            return players.get(pos).toString(); // CPU / HUMAN
+        if (pieceMap.containsKey(pos)) {
+            return pieceMap.get(pos).toString(); // CPU / HUMAN
         }
 
         // نوع الخلية
@@ -201,8 +208,8 @@ public class State {
 
     private int countPieces(Player player) {
         int count = 0;
-        for (Player p : players.values()) {
-            if (p == player) count++;
+        for (Piece piece : pieceMap.values()) {
+            if (piece == player.getPiece()) count++;
         }
         return count;
     }
@@ -215,13 +222,13 @@ public class State {
 
         State state = (State) object;
         return currentPlayer == state.currentPlayer
-                && players.equals(state.players);
+                && pieceMap.equals(state.pieceMap);
     }
 
     @Override
     public int hashCode() {
         int result = currentPlayer.hashCode();
-        result = 31 * result + players.hashCode();
+        result = 31 * result + pieceMap.hashCode();
         return result;
     }
 
