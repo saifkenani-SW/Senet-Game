@@ -38,4 +38,16 @@ public class Board {
     public Cell[][] getCells() {
         return cells;
     }
+
+    // تابع لإرجاع نوع الخلية في موقع معين
+    public Type getCellType(Position pos) {
+        int row = pos.getRow();
+        int col = pos.getCol();
+
+        if (row < 0 || row >= cells.length || col < 0 || col >= cells[0].length) {
+            return Type.NORMAL; // افتراضي إذا خارج اللوحة
+        }
+
+        return cells[row][col].getType();
+    }
 }

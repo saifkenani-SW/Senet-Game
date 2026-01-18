@@ -11,7 +11,6 @@ public class State {
     private Player currentPlayer;
     // private int throwingResult;
 
-
     public Map<Position, Piece> getPiece() {
         return pieceMap;
     }
@@ -97,6 +96,17 @@ public class State {
         return piecePositions;
     }
 
+    public List<Position> getOtherPlayerPieces() {
+        List<Position> piecePositions = new ArrayList<>();
+
+        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
+            if (entry.getValue() == getOtherPlayer().getPiece()) {
+                piecePositions.add(entry.getKey());
+            }
+        }
+        return piecePositions;
+    }
+
     public void skipRole() {
         switchPlayer();
     }
@@ -128,11 +138,34 @@ public class State {
         return size;
     }
 
-    public int evaluation() {
-        int evaluation = 0;
+    public double eval(Player player) {
+        double score = 0;
 
-        return evaluation;
+        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
+            Piece piece = entry.getValue();
+            Position pos = entry.getKey();
+            Type cellType = Board.getInstance().getCellType(pos);
+
+            double pieceValue = 1; // قيمة أساسية لكل قطعة
+
+            // إضافة وزن حسب نوع الخلية
+            switch (cellType) {
+                case CHECK_POINT -> pieceValue += 1;   // خلية مهمة
+                case FREEDOM -> pieceValue += 3;      // نهاية جيدة
+                case RETURN -> pieceValue -= 1;       // خطر
+                case NEW_BEGINNING -> pieceValue += 0.5; // بداية قوية
+                case TREE -> pieceValue += 0.5;       // خلية خاصة
+                case TOW -> pieceValue += 0.5;        // خلية خاصة
+                case NORMAL -> pieceValue += 0;       // عادية
+            }
+
+            if (piece == player.getPiece()) score += pieceValue;  // نقاط اللاعب
+            else score -= pieceValue;                              // نقاط الخصم
+        }
+
+        return score;
     }
+
 
 
 
@@ -150,8 +183,10 @@ public class State {
 
         sb.append("\n==================== SENET GAME ====================\n\n");
         sb.append("Current Player : ").append(currentPlayer).append("\n");
-        sb.append("CPU Pieces     : ").append(countPieces(Player.PLAYER1)).append("\n");
-        sb.append("HUMAN Pieces   : ").append(countPieces(Player.PLAYER2)).append("\n\n");
+        sb.append("Current Player : ").append(currentPlayer.getPiece()).append("\n\n");
+
+        sb.append("PLAYER1 Pieces : ").append(countPieces(Player.PLAYER1)).append("\n");
+        sb.append("PLAYER2 Pieces : ").append(countPieces(Player.PLAYER2)).append("\n\n");
 
 
         sb.append(renderBoard());

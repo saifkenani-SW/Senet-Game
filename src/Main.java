@@ -1,8 +1,4 @@
-import game.Player;
-import game.Position;
 import game.State;
-import game.Type;
-import logic.Move;
 import logic.Play;
 
 
