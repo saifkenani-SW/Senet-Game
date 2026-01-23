@@ -4,17 +4,22 @@ import algorithim.OutComesChances;
 import logic.Move;
 
 import java.util.List;
-import java.util.Map;
 
 public class EvaluationEngine {
-    State state;
-    double K ;
+    private final State state;
+    private double K;
 
-    double W_material;
-    double W_progress;
-    double W_position;
-    double W_mobility;
-    double W_capture;
+    // أوزان العوامل
+    private double W_material;
+    private double W_progress;
+    private double W_position;
+    private double W_mobility;
+    private double W_capture;
+    private double W_safety;
+
+    public EvaluationEngine(State state){
+        this.state = state;
+    }
 
     public void setDifficulty(Difficulty d){
         this.K = d.k;
@@ -24,254 +29,153 @@ public class EvaluationEngine {
         W_position  = 2 * K;
         W_mobility  = 2 * K;
         W_capture   = 3 * K;
+        W_safety    = 2 * K;
     }
 
-    public EvaluationEngine(State state){
-        this.state = state;
-    }
-
-
-
+    // دالة التقييم الرئيسية
     public double eval(){
+        List<Position> myPositions = state.getCurrentPlayerPiecesPositions();
+        List<Position> opponentPositions = state.getOtherPlayerPiecesPositions();
 
         return
-            W_material * (myFinishedPieces() - opponentFinishedPieces()) +
-            W_progress * (myProgress() - opponentProgress()) +
-            W_position * (myPositions() - opponentPositions()) +
-            W_capture  * (possibleCapturesForMe() - possibleCapturesForOpponent()) +
-            W_mobility * (mobilityForMe() - mobilityForOpponent());
+            W_material * evaluateFinishedPieces(myPositions, opponentPositions) +
+            W_progress * evaluateProgress(myPositions, opponentPositions) +
+            W_position * evaluateCellPositions(myPositions, opponentPositions) +
+            W_capture  * evaluateCaptures(myPositions, opponentPositions) +
+            W_mobility * evaluateMobility(myPositions, opponentPositions) +
+            W_safety   * evaluateSafety(myPositions, opponentPositions);
     }
 
+    // ------------------- Material -------------------
+    private double evaluateFinishedPieces(List<Position> myPositions, List<Position> opponentPositions){
+        return (7 - myPositions.size()) * 5 - (7 - opponentPositions.size()) * 5;
+    }
 
-    public double myPositions(){
+    // ------------------- Progress -------------------
+    private double evaluateProgress(List<Position> myPositions, List<Position> opponentPositions){
+        return calculateProgress(myPositions) - calculateProgress(opponentPositions);
+    }
+
+    private double calculateProgress(List<Position> positions){
         double score = 0;
-        for (Map.Entry<Position,Piece> entry: state.getCurrentPlayerPieces().entrySet()){
-            Position pos = entry.getKey();
-            Type cellType = Board.getInstance().getCellType(pos);
-
-            double pieceValue = 1;
-
-            switch (cellType) {
-                case FREEDOM -> pieceValue += 10;
-                case CHECK_POINT -> pieceValue += 5;
-                case RETURN -> pieceValue -= 10;
-                case NEW_BEGINNING -> pieceValue += 7;
-                case TREE, TOW -> pieceValue += -5;
-                case NORMAL -> pieceValue += 0;
+        for (Position pos : positions){
+            double value = 0;
+            switch(pos.getRow()){
+                case 0 -> value = pos.getCol() / 10.0;
+                case 1 -> value = (9 - pos.getCol()) / 10.0 + 0.5;
+                case 2 -> value = pos.getCol() / 10.0 + 1.0;
             }
-
-            score += pieceValue;
-        }
-
-        return score;
-    }
-
-    public double opponentPositions(){
-        double score = 0;
-        for (Map.Entry<Position,Piece> entry: state.getOtherPlayerPieces().entrySet()){
-            Position pos = entry.getKey();
-            Type cellType = Board.getInstance().getCellType(pos);
-
-            double pieceValue = 1;
-
-            // إضافة وزن حسب نوع الخلية
-            switch (cellType) {
-                case FREEDOM -> pieceValue += 10;
-                case CHECK_POINT -> pieceValue += 5;
-                case RETURN -> pieceValue -= 10;
-                case NEW_BEGINNING -> pieceValue += 7;
-                case TREE, TOW -> pieceValue += -5;
-                case NORMAL -> pieceValue += 0;
-            }
-
-            score += pieceValue;
-
-        }
-
-        return score;
-    }
-
-    public double myProgress() {
-        double score = 0;
-        Map<Position, Piece> myPieces = state.getCurrentPlayerPieces();
-
-        for (Map.Entry<Position, Piece> entry : myPieces.entrySet()) {
-            Position pos = entry.getKey();
-
-            double pieceValue = 0.0;
-
-            switch (pos.getRow()) {
-                case 0 -> pieceValue = pos.getCol() / 10.0;
-                case 1 -> pieceValue = (9 - pos.getCol()) / 10.0 + 0.5;
-                case 2 -> pieceValue = (pos.getCol() / 10.0) + 1.0;
-            }
-
-            score += pieceValue;
-        }
-
-        return score;
-    }
-
-    public double opponentProgress() {
-        double score = 0;
-        Map<Position, Piece> opponentPieces = state.getOtherPlayerPieces();
-
-        for (Map.Entry<Position, Piece> entry : opponentPieces.entrySet()) {
-            Position pos = entry.getKey();
-
-            double pieceValue = 0.0;
-
-            switch (pos.getRow()) {
-                case 0 -> pieceValue = pos.getCol() / 10.0;
-                case 1 -> pieceValue = (9 - pos.getCol()) / 10.0 + 0.5;
-                case 2 -> pieceValue = (pos.getCol() / 10.0) + 1.0;
-            }
-
-            score += pieceValue;
-        }
-
-        return score;
-    }
-
-
-    public double myFinishedPieces(){
-
-        Map<Position, Piece> myPieces = state.getCurrentPlayerPieces();
-
-        return (7 - myPieces.size()) * 5;
-    }
-
-    public double opponentFinishedPieces(){
-
-        Map<Position, Piece> opponentPieces = state.getOtherPlayerPieces();
-
-        return (7 - opponentPieces.size()) * 5;
-    }
-
-    public double possibleCapturesForMe(){
-        double score = 0;
-        List<OutComesChances> ocs = OutComesChances.makeStates();
-        Map<Position, Piece> myPieces = state.getCurrentPlayerPieces();
-
-        for (Map.Entry<Position, Piece> entry: myPieces.entrySet()){
-            for (OutComesChances oc : ocs){
-                score += oc.getProbability() * canCaptureOpponent(oc.getThrowing() , entry.getKey());
-            }
+            score += value;
         }
         return score;
     }
 
-    public double possibleCapturesForOpponent(){
-        double score = 0;
-        List<OutComesChances> ocs = OutComesChances.makeStates();
-        Map<Position, Piece> opponentPieces = state.getOtherPlayerPieces();
-
-        for (Map.Entry<Position, Piece> entry: opponentPieces.entrySet()){
-            for (OutComesChances oc : ocs){
-                score += oc.getProbability() * canCaptureMe(oc.getThrowing() , entry.getKey());
-            }
-        }
-        return score;
+    // ------------------- Cell Positions -------------------
+    private double evaluateCellPositions(List<Position> myPositions, List<Position> opponentPositions){
+        return calculateCellScore(myPositions) - calculateCellScore(opponentPositions);
     }
 
-    private double canCaptureOpponent(int throwingResult, Position myPiece) {
+    private double calculateCellScore(List<Position> positions){
         double score = 0;
-        List<Position> otherPieces = state.getOtherPlayerPiecesPositions();
-
-        Position targetPos = myPiece.nextPosition(throwingResult);
-
-        if (!otherPieces.contains(targetPos))
-            return score;
-
-        Type cellType = Board.getInstance().getCellType(targetPos);
-        double pieceValue;
-        pieceValue = switch (cellType) {
-            case CHECK_POINT -> 5;
-            case FREEDOM -> 10;
-            case NEW_BEGINNING -> 7;
-            case TREE, TOW -> -5;
-            case NORMAL -> 3;
-            case RETURN -> -10;
-        };
-        score += pieceValue;
-
-        return score;
-    }
-
-    private double canCaptureMe(int throwingResult, Position myPiece) {
-        double score = 0;
-        List<Position> otherPieces = state.getCurrentPlayerPiecesPositions();
-
-        Position targetPos = myPiece.nextPosition(throwingResult);
-
-        if (!otherPieces.contains(targetPos))
-            return score;
-
-        Type cellType = Board.getInstance().getCellType(targetPos);
-        double pieceValue;
-        pieceValue = switch (cellType) {
-            case CHECK_POINT -> 5;
-            case FREEDOM -> 10;
-            case NEW_BEGINNING -> 7;
-            case TREE, TOW -> -5;
-            case NORMAL -> 3;
-            case RETURN -> -10;
-        };
-        score += pieceValue;
-
-        return score;
-    }
-
-    public double mobilityForMe(){
-        double score = 0;
-        List<OutComesChances> ocs = OutComesChances.makeStates();
-        Map<Position, Piece> myPieces = state.getCurrentPlayerPieces();
-
-        for (Map.Entry<Position, Piece> entry: myPieces.entrySet()){
-            for (OutComesChances oc : ocs){
-                score += getAllLegalMoves(oc.getThrowing() , entry.getKey());
-            }
-        }
-        return score;
-    }
-
-    private double getAllLegalMoves(int throwingResult, Position myPiece){
-        double score = 0;
-
-        Position targetPos = myPiece.nextPosition(throwingResult);
-
-        Move move = new Move();
-        if (move.canMove(state.getPieces(), targetPos, throwingResult)){
-            Type cellType = Board.getInstance().getCellType(targetPos);
-            double pieceValue;
-            pieceValue = switch (cellType) {
-                case CHECK_POINT -> 5;
-                case FREEDOM -> 10;
-                case NEW_BEGINNING -> 7;
-                case TREE, TOW -> -5;
-                case NORMAL -> 0;
+        for (Position pos : positions){
+            Type type = Board.getInstance().getCellType(pos);
+            score += switch(type){
+                case FREEDOM -> 11;
+                case CHECK_POINT -> 6;
+                case NEW_BEGINNING -> 8;
+                case TREE, TOW -> -4;
                 case RETURN -> -10;
+                case NORMAL -> 1;
             };
-            score += pieceValue;
         }
-
         return score;
     }
 
-    public double mobilityForOpponent(){
+    // ------------------- Mobility -------------------
+    private double evaluateMobility(List<Position> myPositions, List<Position> opponentPositions){
+        double myScore = calculateMobility(myPositions);
+        double opponentScore = calculateMobility(opponentPositions);
+        return myScore - opponentScore;
+    }
+
+    private double calculateMobility(List<Position> positions){
         double score = 0;
         List<OutComesChances> ocs = OutComesChances.makeStates();
-        Map<Position, Piece> opponentPieces = state.getOtherPlayerPieces();
+        Move move = new Move();
 
-        for (Map.Entry<Position, Piece> entry: opponentPieces.entrySet()){
+        for (Position pos : positions){
             for (OutComesChances oc : ocs){
-                score += getAllLegalMoves(oc.getThrowing() , entry.getKey());
+                Position target = pos.nextPosition(oc.getThrowing());
+                if (move.canMove(state.getPieces(), target, oc.getThrowing())){
+                    score += getCellValue(target);
+                }
             }
         }
         return score;
     }
 
+    // ------------------- Captures -------------------
+    private double evaluateCaptures(List<Position> myPositions, List<Position> opponentPositions){
+        return calculateCaptureScore(myPositions, opponentPositions) - calculateCaptureScore(opponentPositions, myPositions);
+    }
 
+    private double calculateCaptureScore(List<Position> attackerPositions, List<Position> defenderPositions){
+        double score = 0;
+        List<OutComesChances> ocs = OutComesChances.makeStates();
 
+        for (Position pos : attackerPositions){
+            for (OutComesChances oc : ocs){
+                Position target = pos.nextPosition(oc.getThrowing());
+                if (defenderPositions.contains(target)){
+                    score += oc.getProbability() * getCellValue(target);
+                }
+            }
+        }
+        return score;
+    }
 
+    // ------------------- Safety -------------------
+    private double evaluateSafety(List<Position> myPositions, List<Position> opponentPositions){
+        return calculateSafetyScore(myPositions, opponentPositions) - calculateSafetyScore(opponentPositions, myPositions);
+    }
+
+    private double calculateSafetyScore(List<Position> threatenedPositions, List<Position> attackerPositions){
+        double score = 0;
+        List<OutComesChances> ocs = OutComesChances.makeStates();
+
+        for (Position pos : threatenedPositions){
+            for (OutComesChances oc : ocs){
+                Position target = pos.nextPosition(oc.getThrowing());
+                if (attackerPositions.contains(target)){
+                    score += oc.getProbability() * getThreatValue(target);
+                }
+            }
+        }
+        return score;
+    }
+
+    // ------------------- Helper: cell value -------------------
+    private double getCellValue(Position pos){
+        Type type = Board.getInstance().getCellType(pos);
+        return switch(type){
+            case FREEDOM -> 10;
+            case CHECK_POINT -> 5;
+            case NEW_BEGINNING -> 7;
+            case TREE, TOW -> -5;
+            case RETURN -> -10;
+            case NORMAL -> 0;
+        };
+    }
+
+    private double getThreatValue(Position pos){
+        Type type = Board.getInstance().getCellType(pos);
+        return switch(type){
+            case FREEDOM -> 2.5;
+            case CHECK_POINT -> 1.5;
+            case NEW_BEGINNING -> 2;
+            case TREE, TOW -> 1.0;
+            case RETURN -> 0;
+            case NORMAL -> 0.5;
+        };
+    }
 }
