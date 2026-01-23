@@ -1,6 +1,7 @@
 package logic;
 
 import algorithim.ExpectMiniMax;
+import evaluation.Difficulty;
 import game.*;
 
 import java.util.Iterator;
@@ -75,6 +76,8 @@ public class Play {
     public State play() {
         System.out.println("====== Senet Start ======");
 
+        Difficulty difficulty = Difficulty.getDifficultyType(scanner);
+
         while (true) {
             if (state.checkWinning()) {
                 Player winner = state.getWinner();
@@ -132,7 +135,7 @@ public class Play {
                 int throwingResult = scanner.nextInt();
 
                 System.out.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
-                ExpectMiniMax expectMiniMax = new ExpectMiniMax();
+                ExpectMiniMax expectMiniMax = new ExpectMiniMax(difficulty);
 
                 StateEvaluation newState = expectMiniMax.maxMove(state, 4, throwingResult);
 

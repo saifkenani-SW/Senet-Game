@@ -32,14 +32,15 @@ public class OutComesChances {
         return probability;
     }
 
-    public static List<OutComesChances> makeStates() {
-        return List.of(
-                new OutComesChances(0.25, 1),
-                new OutComesChances(0.375, 2),
-                new OutComesChances(0.25, 3),
-                new OutComesChances(0.0625, 4),
-                new OutComesChances( 0.0625, 5)
-        );
+    public static final List<OutComesChances> STATES = List.of(
+            new OutComesChances(0.25, 1),
+            new OutComesChances(0.375, 2),
+            new OutComesChances(0.25, 3),
+            new OutComesChances(0.0625, 4),
+            new OutComesChances(0.0625, 5)
+    );
 
+    public static List<OutComesChances> makeStates() {
+        return STATES;
     }
 }

@@ -10,8 +10,8 @@ import logic.Move;
 import java.util.List;
 
 public class EvaluationEngine {
+
     private final State state;
-    private double K;
 
     // أوزان العوامل
     private double W_material;
@@ -26,42 +26,43 @@ public class EvaluationEngine {
     }
 
     public void setDifficulty(Difficulty d) {
+        double k;
         switch (d) {
             case EASY -> {
-                K = 0.5;
-                W_material  = 3 * K;   // يركز أقل على القوة
-                W_progress  = 2 * K;   // لا يحسب التقدم كثيرًا
-                W_position  = 1 * K;   // خفيف على وضعية القطع
-                W_mobility  = 1 * K;   // قليل التفكير في الحركة
-                W_capture   = 1 * K;   // لا يهاجم كثيرًا
-                W_safety    = 0.5 * K; // لا يحمي القطع كثيرًا
+                k = 0.5;
+                W_material  = 3 * k;   // يركز أقل على القوة
+                W_progress  = 2 * k;   // لا يحسب التقدم كثيرًا
+                W_position  = 1 * k;   // خفيف على وضعية القطع
+                W_mobility  = 1 * k;   // قليل التفكير في الحركة
+                W_capture   = 1 * k;   // لا يهاجم كثيرًا
+                W_safety    = 0.5 * k; // لا يحمي القطع كثيرًا
             }
             case NORMAL -> {
-                K = 1.0;
-                W_material  = 4 * K;
-                W_progress  = 3 * K;
-                W_position  = 2 * K;
-                W_mobility  = 2 * K;
-                W_capture   = 3 * K;
-                W_safety    = 2 * K;
+                k = 1.0;
+                W_material  = 4 * k;
+                W_progress  = 3 * k;
+                W_position  = 2 * k;
+                W_mobility  = 2 * k;
+                W_capture   = 3 * k;
+                W_safety    = 2 * k;
             }
             case HARD -> {
-                K = 1.5;
-                W_material  = 5 * K;   // يركز على القوة
-                W_progress  = 4 * K;   // يقدر التقدم أكثر
-                W_position  = 3 * K;   // يهتم بوضعية القطع
-                W_mobility  = 3 * K;   // يخطط أكثر للحركة
-                W_capture   = 4 * K;   // هجومي أكثر
-                W_safety    = 3 * K;   // يحمي القطع جيدًا
+                k = 1.5;
+                W_material  = 5 * k;   // يركز على القوة
+                W_progress  = 4 * k;   // يقدر التقدم أكثر
+                W_position  = 3 * k;   // يهتم بوضعية القطع
+                W_mobility  = 3 * k;   // يخطط أكثر للحركة
+                W_capture   = 4 * k;   // هجومي أكثر
+                W_safety    = 3 * k;   // يحمي القطع جيدًا
             }
             case EXPERT -> {
-                K = 2.0;
-                W_material  = 6 * K;   // كل شيء مؤثر
-                W_progress  = 5 * K;
-                W_position  = 4 * K;
-                W_mobility  = 4 * K;
-                W_capture   = 5 * K;
-                W_safety    = 4 * K;
+                k = 2.0;
+                W_material  = 6 * k;   // كل شيء مؤثر
+                W_progress  = 5 * k;
+                W_position  = 4 * k;
+                W_mobility  = 4 * k;
+                W_capture   = 5 * k;
+                W_safety    = 4 * k;
             }
         }
     }
@@ -213,4 +214,5 @@ public class EvaluationEngine {
             case NORMAL -> 0.5;
         };
     }
+
 }

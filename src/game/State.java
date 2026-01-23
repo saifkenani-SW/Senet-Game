@@ -287,8 +287,11 @@ public class State {
         return result;
     }
 
-    public double eval(){
-        return new EvaluationEngine(this).eval();
+    public double eval(Difficulty d){
+        EvaluationEngine engine = new EvaluationEngine(this);
+        engine.setDifficulty(d);
+
+        return engine.eval();
     }
 
 
