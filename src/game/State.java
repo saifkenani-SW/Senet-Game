@@ -11,26 +11,6 @@ public class State {
     private Map<Position, Piece> pieceMap = new HashMap<>();
     private Player currentPlayer;
 
-    double K ;
-
-    double W_material;
-    double W_progress;
-    double W_position;
-    double W_mobility;
-    double W_capture;
-
-    public void setDifficulty(Difficulty d){
-        this.K = d.k;
-
-        W_material  = 4 * K;
-        W_progress  = 3 * K;
-        W_position  = 2 * K;
-        W_mobility  = 2 * K;
-        W_capture   = 3 * K;
-    }
-
-
-
     public Map<Position, Piece> getPieces() {
         return pieceMap;
     }
