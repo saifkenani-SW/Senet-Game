@@ -1,4 +1,4 @@
-package game;
+package evaluation;
 
 public enum Difficulty {
     EASY(0.6),

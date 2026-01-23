@@ -1,8 +1,8 @@
 package game;
 
-import algorithim.OutComesChances;
+import evaluation.Difficulty;
+import evaluation.EvaluationEngine;
 import logic.Move;
-import logic.Throwing;
 
 import java.util.*;
 

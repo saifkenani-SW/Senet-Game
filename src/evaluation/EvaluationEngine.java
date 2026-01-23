@@ -1,6 +1,10 @@
-package game;
+package evaluation;
 
 import algorithim.OutComesChances;
+import game.Board;
+import game.Position;
+import game.State;
+import game.Type;
 import logic.Move;
 
 import java.util.List;
