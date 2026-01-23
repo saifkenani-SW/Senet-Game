@@ -77,6 +77,11 @@ public class Play {
         System.out.println("====== Senet Start ======");
 
         Difficulty difficulty = Difficulty.getDifficultyType(scanner);
+        System.out.print("Do you want to enable Debug mode? (y/n): ");
+        String debugInput = scanner.next().trim().toLowerCase();
+        boolean debug = debugInput.equals("y");
+
+        ExpectMiniMax expectMiniMax = new ExpectMiniMax(difficulty, debug);
 
         while (true) {
             if (state.checkWinning()) {
@@ -135,9 +140,8 @@ public class Play {
                 int throwingResult = scanner.nextInt();
 
                 System.out.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
-                ExpectMiniMax expectMiniMax = new ExpectMiniMax(difficulty);
 
-                StateEvaluation newState = expectMiniMax.maxMove(state, 4, throwingResult);
+                StateEvaluation newState = expectMiniMax.maxMove(state, throwingResult);
 
                 Position selectedPosition = getNewPosition(newState.getState());
                 System.out.println("Evaluation for this state is : " + newState.getEvaluation());
@@ -148,13 +152,8 @@ public class Play {
                     continue;
                 }
 
-                //save player for "Try again"
                 Player currentPlayerBeforeMove = state.getCurrentPlayer();
-//                System.out.println("First\n" + state.toString());
                 state = move.move(state, selectedPosition, throwingResult);
-//                System.out.println( "Second\n" + state.toString());
-//                System.out.println("pawn now in (" + selectedPosition.getRow() + " , " + selectedPosition.getCol() + ")");
-
             }
         }
     }

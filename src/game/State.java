@@ -287,11 +287,14 @@ public class State {
         return result;
     }
 
-    public double eval(Difficulty d){
-        EvaluationEngine engine = new EvaluationEngine(this);
+    public double eval(Difficulty d, boolean debug){
+        EvaluationEngine engine = new EvaluationEngine(this, debug);
         engine.setDifficulty(d);
+        double eval = engine.eval();
+        if (debug)
+            System.out.println(engine);
 
-        return engine.eval();
+        return eval;
     }
 
 

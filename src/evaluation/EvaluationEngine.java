@@ -12,6 +12,7 @@ import java.util.List;
 public class EvaluationEngine {
 
     private final State state;
+    private boolean debug;
 
     // أوزان العوامل
     private double W_material;
@@ -21,8 +22,18 @@ public class EvaluationEngine {
     private double W_capture;
     private double W_safety;
 
-    public EvaluationEngine(State state){
+    private double totalMaterialScore;
+    private double totalProgressScore;
+    private double totalPositionScore;
+    private double totalMobilityScore;
+    private double totalCaptureScore;
+    private double totalSafetyScore;
+    private double totalEvaluation;
+
+
+    public EvaluationEngine(State state, boolean debug){
         this.state = state;
+        this.debug = debug;
     }
 
     public void setDifficulty(Difficulty d) {
@@ -30,12 +41,12 @@ public class EvaluationEngine {
         switch (d) {
             case EASY -> {
                 k = 0.5;
-                W_material  = 3 * k;   // يركز أقل على القوة
-                W_progress  = 2 * k;   // لا يحسب التقدم كثيرًا
-                W_position  = 1 * k;   // خفيف على وضعية القطع
-                W_mobility  = 1 * k;   // قليل التفكير في الحركة
-                W_capture   = 1 * k;   // لا يهاجم كثيرًا
-                W_safety    = 0.5 * k; // لا يحمي القطع كثيرًا
+                W_material  = 3 * k;
+                W_progress  = 2 * k;
+                W_position  = 1 * k;
+                W_mobility  = 1 * k;
+                W_capture   = 1 * k;
+                W_safety    = 0.5 * k;
             }
             case NORMAL -> {
                 k = 1.0;
@@ -48,16 +59,16 @@ public class EvaluationEngine {
             }
             case HARD -> {
                 k = 1.5;
-                W_material  = 5 * k;   // يركز على القوة
-                W_progress  = 4 * k;   // يقدر التقدم أكثر
-                W_position  = 3 * k;   // يهتم بوضعية القطع
-                W_mobility  = 3 * k;   // يخطط أكثر للحركة
-                W_capture   = 4 * k;   // هجومي أكثر
-                W_safety    = 3 * k;   // يحمي القطع جيدًا
+                W_material  = 5 * k;
+                W_progress  = 4 * k;
+                W_position  = 3 * k;
+                W_mobility  = 3 * k;
+                W_capture   = 4 * k;
+                W_safety    = 3 * k;
             }
             case EXPERT -> {
                 k = 2.0;
-                W_material  = 6 * k;   // كل شيء مؤثر
+                W_material  = 6 * k;
                 W_progress  = 5 * k;
                 W_position  = 4 * k;
                 W_mobility  = 4 * k;
@@ -68,18 +79,31 @@ public class EvaluationEngine {
     }
 
 
-    // دالة التقييم الرئيسية
     public double eval(){
         List<Position> myPositions = state.getCurrentPlayerPiecesPositions();
         List<Position> opponentPositions = state.getOtherPlayerPiecesPositions();
 
-        return
-            W_material * evaluateFinishedPieces(myPositions, opponentPositions) +
-            W_progress * evaluateProgress(myPositions, opponentPositions) +
-            W_position * evaluateCellPositions(myPositions, opponentPositions) +
-            W_capture  * evaluateCaptures(myPositions, opponentPositions) +
-            W_mobility * evaluateMobility(myPositions, opponentPositions) +
-            W_safety   * evaluateSafety(myPositions, opponentPositions);
+        totalMaterialScore = W_material * evaluateFinishedPieces(myPositions, opponentPositions);
+        totalProgressScore = W_progress * evaluateProgress(myPositions, opponentPositions);
+        totalPositionScore = W_position * evaluateCellPositions(myPositions, opponentPositions);
+        totalCaptureScore = W_capture  * evaluateCaptures(myPositions, opponentPositions);
+        totalMobilityScore = W_mobility * evaluateMobility(myPositions, opponentPositions);
+        totalSafetyScore = W_safety   * evaluateSafety(myPositions, opponentPositions);
+        totalEvaluation = totalMaterialScore + totalProgressScore + totalPositionScore + totalCaptureScore + totalMobilityScore + totalSafetyScore;
+        return totalEvaluation;
+    }
+
+    @Override
+    public String toString() {
+        return "EvaluationEngine {" +
+                "\n\ttotalMobilityScore = " + totalMobilityScore +
+                "\n\ttotalSafetyScore = " + totalSafetyScore +
+                "\n\ttotalCaptureScore = " + totalCaptureScore +
+                "\n\ttotalPositionScore = " + totalPositionScore +
+                "\n\ttotalProgressScore = " + totalProgressScore +
+                "\n\ttotalMaterialScore = " + totalMaterialScore +
+                "\n\ttotalEvaluation = " + totalEvaluation +
+                "\n}";
     }
 
     // ------------------- Material -------------------
@@ -105,6 +129,22 @@ public class EvaluationEngine {
         }
         return score;
     }
+
+//    private double total(List<Position> myPositions, List<Position> opponentPositions){
+//        double myProgressScore = 0;
+//        double opponentProgressScore = 0;
+//
+//        for (Position pos : myPositions){
+//            double value = 0;
+//            switch(pos.getRow()){
+//                case 0 -> value = pos.getCol() / 10.0;
+//                case 1 -> value = (9 - pos.getCol()) / 10.0 + 0.5;
+//                case 2 -> value = pos.getCol() / 10.0 + 1.0;
+//            }
+//            score += value;
+//        }
+//        return score;
+//    }
 
     // ------------------- Cell Positions -------------------
     private double evaluateCellPositions(List<Position> myPositions, List<Position> opponentPositions){
@@ -176,17 +216,45 @@ public class EvaluationEngine {
     }
 
     private double calculateSafetyScore(List<Position> threatenedPositions, List<Position> attackerPositions){
+        double directAttackers = 0;
         double score = 0;
+        double directThreat = 0;
+
         List<OutComesChances> ocs = OutComesChances.makeStates();
 
-        for (Position pos : threatenedPositions){
+        for (Position pos : attackerPositions){
             for (OutComesChances oc : ocs){
                 Position target = pos.nextPosition(oc.getThrowing());
-                if (attackerPositions.contains(target)){
-                    score += oc.getProbability() * getThreatValue(target);
+                if (threatenedPositions.contains(target)){
+                    directThreat += oc.getProbability() * getCellValue(target);
+                    directAttackers++;
                 }
             }
         }
+        score -= directThreat * 12;
+
+        if (directAttackers > 1){
+            score -= directAttackers * 4;   // كل مهاجم إضافي خطر
+        }
+
+        for (Position pos : attackerPositions){
+            for (Position pos2 : threatenedPositions){
+                double attackerDistance =  pos2.getIndexForEval() - pos.getIndexForEval();
+
+                if (attackerDistance > 0) {
+                    int d = (int) Math.ceil(attackerDistance / 5);
+                    attackerDistance = switch (d) {
+                        case 1 -> 5;
+                        case 2 -> 3;
+                        case 3 -> 1.5;
+                        default -> 0;
+                    };
+                    score -= attackerDistance;
+                }
+            }
+        }
+
+
         return score;
     }
 
@@ -203,16 +271,6 @@ public class EvaluationEngine {
         };
     }
 
-    private double getThreatValue(Position pos){
-        Type type = Board.getInstance().getCellType(pos);
-        return switch(type){
-            case FREEDOM -> 2.5;
-            case CHECK_POINT -> 1.5;
-            case NEW_BEGINNING -> 2;
-            case TREE, TOW -> 1.0;
-            case RETURN -> 0;
-            case NORMAL -> 0.5;
-        };
-    }
+
 
 }

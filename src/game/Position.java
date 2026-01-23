@@ -102,6 +102,13 @@ public class Position {
         return row * 10 + col + 1;
     }
 
+    public int getIndexForEval() {
+        if (row == 1){
+            return row * 10 - col ;
+        }
+        return row * 10 + col + 1;
+    }
+
     public boolean isOut() {
         return getIndex() > 30;
     }
