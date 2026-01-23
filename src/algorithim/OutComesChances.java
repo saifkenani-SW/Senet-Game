@@ -4,34 +4,41 @@ import game.State;
 
 import java.util.List;
 
-class OutComesChances {
+public class OutComesChances {
 
-    State state;
+//    State state;
     double probability;
+
+    public int getThrowing() {
+        return throwing;
+    }
+
     int throwing;
 
 
-    OutComesChances(State state, double probability, int throwing) {
+    OutComesChances( double probability, int throwing) {
         this.probability = probability;
         this.throwing = throwing;
-        this.state = state;
+//        this.state = state;
     }
 
-    public State getState() {
-        return state;
-    }
+    public OutComesChances(){}
+
+//    public State getState() {
+//        return state;
+//    }
 
     public double getProbability() {
         return probability;
     }
 
-    public static List<OutComesChances> makeStates(State state) {
+    public static List<OutComesChances> makeStates() {
         return List.of(
-                new OutComesChances(state, 0.25, 1),
-                new OutComesChances(state, 0.375, 2),
-                new OutComesChances(state, 0.25, 3),
-                new OutComesChances(state, 0.0625, 4),
-                new OutComesChances(state, 0.0625, 5)
+                new OutComesChances(0.25, 1),
+                new OutComesChances(0.375, 2),
+                new OutComesChances(0.25, 3),
+                new OutComesChances(0.0625, 4),
+                new OutComesChances( 0.0625, 5)
         );
 
     }

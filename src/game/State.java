@@ -1,5 +1,6 @@
 package game;
 
+import algorithim.OutComesChances;
 import logic.Move;
 import logic.Throwing;
 
@@ -9,9 +10,28 @@ public class State {
     private static final Cell[][] board = Board.getInstance().getCells();
     private Map<Position, Piece> pieceMap = new HashMap<>();
     private Player currentPlayer;
-    // private int throwingResult;
 
-    public Map<Position, Piece> getPiece() {
+    double K ;
+
+    double W_material;
+    double W_progress;
+    double W_position;
+    double W_mobility;
+    double W_capture;
+
+    public void setDifficulty(Difficulty d){
+        this.K = d.k;
+
+        W_material  = 4 * K;
+        W_progress  = 3 * K;
+        W_position  = 2 * K;
+        W_mobility  = 2 * K;
+        W_capture   = 3 * K;
+    }
+
+
+
+    public Map<Position, Piece> getPieces() {
         return pieceMap;
     }
 
@@ -36,6 +56,7 @@ public class State {
         //   this.throwingResult = state.throwingResult;
         this.pieceMap = new HashMap<>(state.pieceMap);
     }
+
 
     public void switchPlayer() {
        /* currentPlayer = (currentPlayer == Player.CPU)
@@ -85,7 +106,7 @@ public class State {
         return true;
     }
 
-    public List<Position> getCurrentPlayerPieces() {
+    public List<Position> getCurrentPlayerPiecesPositions() {
         List<Position> piecePositions = new ArrayList<>();
 
         for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
@@ -96,7 +117,18 @@ public class State {
         return piecePositions;
     }
 
-    public List<Position> getOtherPlayerPieces() {
+    public HashMap<Position, Piece> getCurrentPlayerPieces() {
+        HashMap<Position, Piece> pieces = new HashMap<>();
+
+        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
+            if (entry.getValue() == currentPlayer.getPiece()) {
+                pieces.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return pieces;
+    }
+
+    public List<Position> getOtherPlayerPiecesPositions() {
         List<Position> piecePositions = new ArrayList<>();
 
         for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
@@ -105,6 +137,18 @@ public class State {
             }
         }
         return piecePositions;
+    }
+
+    public HashMap<Position, Piece> getOtherPlayerPieces() {
+
+        HashMap<Position, Piece> pieces = new HashMap<>();
+
+        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
+            if (entry.getValue() == getOtherPlayer().getPiece()) {
+                pieces.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return pieces;
     }
 
     public void skipRole() {
@@ -137,37 +181,6 @@ public class State {
         }
         return size;
     }
-
-    public double eval(Player player) {
-        double score = 0;
-
-        for (Map.Entry<Position, Piece> entry : pieceMap.entrySet()) {
-            Piece piece = entry.getValue();
-            Position pos = entry.getKey();
-            Type cellType = Board.getInstance().getCellType(pos);
-
-            double pieceValue = 1; // قيمة أساسية لكل قطعة
-
-            // إضافة وزن حسب نوع الخلية
-            switch (cellType) {
-                case CHECK_POINT -> pieceValue += 1;   // خلية مهمة
-                case FREEDOM -> pieceValue += 3;      // نهاية جيدة
-                case RETURN -> pieceValue -= 1;       // خطر
-                case NEW_BEGINNING -> pieceValue += 0.5; // بداية قوية
-                case TREE -> pieceValue += 0.5;       // خلية خاصة
-                case TOW -> pieceValue += 0.5;        // خلية خاصة
-                case NORMAL -> pieceValue += 0;       // عادية
-            }
-
-            if (piece == player.getPiece()) score += pieceValue;  // نقاط اللاعب
-            else score -= pieceValue;                              // نقاط الخصم
-        }
-
-        return score;
-    }
-
-
-
 
    /* public int getThrowingResult() {
        return throwingResult;
@@ -273,6 +286,11 @@ public class State {
         result = 31 * result + pieceMap.hashCode();
         return result;
     }
+
+    public double eval(){
+        return new EvaluationEngine(this).eval();
+    }
+
 
 
 }

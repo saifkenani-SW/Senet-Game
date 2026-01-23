@@ -13,10 +13,10 @@ public class Move {
     public State move(State current, Position position, int step) {
         State state = new State(current);
 
-        if (!canMove(state.getPiece(), position, step)) {
+        if (!canMove(state.getPieces(), position, step)) {
             return current;
         }
-        Map<Position, Piece> players = state.getPiece();
+        Map<Position, Piece> players = state.getPieces();
         Player currentPlayer = state.getCurrentPlayer();
         Position from = new Position(position);
         Position to = new Position(position.nextPosition(step));
@@ -61,12 +61,11 @@ public class Move {
         }
         state.switchPlayer();
 
-
         return state;
     }
 
     private void handleState(State current) {
-        Map<Position, Piece> pieceMap = current.getPiece();
+        Map<Position, Piece> pieceMap = current.getPieces();
         Player currentPlayer = current.getCurrentPlayer();
         //  Position position_RETURN = new Position(2, 6);
         Position position_TREE = new Position(2, 7);
