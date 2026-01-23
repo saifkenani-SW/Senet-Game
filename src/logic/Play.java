@@ -1,6 +1,7 @@
 package logic;
 
 import algorithim.ExpectMiniMax;
+import evaluation.Difficulty;
 import game.*;
 
 import java.util.Iterator;
@@ -75,6 +76,8 @@ public class Play {
     public State play() {
         System.out.println("====== Senet Start ======");
 
+        Difficulty difficulty = Difficulty.getDifficultyType(scanner);
+
         while (true) {
             if (state.checkWinning()) {
                 Player winner = state.getWinner();
@@ -95,7 +98,7 @@ public class Play {
                     continue;
                 }
 
-                List<Position> positions = state.getCurrentPlayerPieces();
+                List<Position> positions = state.getCurrentPlayerPiecesPositions();
 
                 System.out.println("\n Available parts for " + state.getCurrentPlayer());
                 for (int i = 0; i < positions.size(); i++) {
@@ -112,7 +115,7 @@ public class Play {
 
                 Position selectedPosition = positions.get(choice - 1);
 
-                if (!move.canMove(state.getPiece(), selectedPosition, throwingResult)) {
+                if (!move.canMove(state.getPieces(), selectedPosition, throwingResult)) {
                     System.err.println("You can not move it now!");
                     System.err.println("Try again");
                     continue;
@@ -132,14 +135,14 @@ public class Play {
                 int throwingResult = scanner.nextInt();
 
                 System.out.println("throwing: " + throwingResult + getDiceDescription(throwingResult));
-                ExpectMiniMax expectMiniMax = new ExpectMiniMax();
+                ExpectMiniMax expectMiniMax = new ExpectMiniMax(difficulty);
 
                 StateEvaluation newState = expectMiniMax.maxMove(state, 4, throwingResult);
 
                 Position selectedPosition = getNewPosition(newState.getState());
                 System.out.println("Evaluation for this state is : " + newState.getEvaluation());
 
-                if (!move.canMove(state.getPiece(), selectedPosition, throwingResult)) {
+                if (!move.canMove(state.getPieces(), selectedPosition, throwingResult)) {
                     System.err.println("You can not move it now!");
                     System.err.println("Try again");
                     continue;
@@ -157,8 +160,8 @@ public class Play {
     }
 
     private Position getNewPosition(State newState){
-        List<Position> positions1 = state.getCurrentPlayerPieces();
-        List<Position> positions2 = newState.getOtherPlayerPieces();
+        List<Position> positions1 = state.getCurrentPlayerPiecesPositions();
+        List<Position> positions2 = newState.getOtherPlayerPiecesPositions();
 
         Iterator<Position> iterator1 = positions1.iterator();
         while (iterator1.hasNext()) {
