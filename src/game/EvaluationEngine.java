@@ -21,16 +21,47 @@ public class EvaluationEngine {
         this.state = state;
     }
 
-    public void setDifficulty(Difficulty d){
-        this.K = d.k;
-
-        W_material  = 4 * K;
-        W_progress  = 3 * K;
-        W_position  = 2 * K;
-        W_mobility  = 2 * K;
-        W_capture   = 3 * K;
-        W_safety    = 2 * K;
+    public void setDifficulty(Difficulty d) {
+        switch (d) {
+            case EASY -> {
+                K = 0.5;
+                W_material  = 3 * K;   // يركز أقل على القوة
+                W_progress  = 2 * K;   // لا يحسب التقدم كثيرًا
+                W_position  = 1 * K;   // خفيف على وضعية القطع
+                W_mobility  = 1 * K;   // قليل التفكير في الحركة
+                W_capture   = 1 * K;   // لا يهاجم كثيرًا
+                W_safety    = 0.5 * K; // لا يحمي القطع كثيرًا
+            }
+            case NORMAL -> {
+                K = 1.0;
+                W_material  = 4 * K;
+                W_progress  = 3 * K;
+                W_position  = 2 * K;
+                W_mobility  = 2 * K;
+                W_capture   = 3 * K;
+                W_safety    = 2 * K;
+            }
+            case HARD -> {
+                K = 1.5;
+                W_material  = 5 * K;   // يركز على القوة
+                W_progress  = 4 * K;   // يقدر التقدم أكثر
+                W_position  = 3 * K;   // يهتم بوضعية القطع
+                W_mobility  = 3 * K;   // يخطط أكثر للحركة
+                W_capture   = 4 * K;   // هجومي أكثر
+                W_safety    = 3 * K;   // يحمي القطع جيدًا
+            }
+            case EXPERT -> {
+                K = 2.0;
+                W_material  = 6 * K;   // كل شيء مؤثر
+                W_progress  = 5 * K;
+                W_position  = 4 * K;
+                W_mobility  = 4 * K;
+                W_capture   = 5 * K;
+                W_safety    = 4 * K;
+            }
+        }
     }
+
 
     // دالة التقييم الرئيسية
     public double eval(){
