@@ -6,10 +6,9 @@ public class StateEvaluation {
     int throwing; // رمية النقلة التي أدت لهذه الحالة
 
 
-    public StateEvaluation(State state, double evaluation, int throwing) {
+    public StateEvaluation(State state, double evaluation) {
         this.state = state;
         this.evaluation = evaluation;
-        this.throwing = throwing;
 
     }
 

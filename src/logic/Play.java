@@ -76,7 +76,7 @@ public class Play {
     public State play() {
         System.out.println("====== Senet Start ======");
 
-        Difficulty difficulty = Difficulty.getDifficultyType(scanner);
+        Difficulty difficulty = Difficulty.choseDifficultyType(scanner);
         System.out.print("Do you want to enable Debug mode? (y/n): ");
         String debugInput = scanner.next().trim().toLowerCase();
         boolean debug = debugInput.equals("y");
@@ -153,7 +153,12 @@ public class Play {
                 }
 
                 Player currentPlayerBeforeMove = state.getCurrentPlayer();
+//                System.out.println("Current Player Before Move in Computer for new State is : " + newState.getState().getCurrentPlayer());
+//
+//                System.out.println("Current Player Before Move in Computer is : " + state.getCurrentPlayer());
+
                 state = move.move(state, selectedPosition, throwingResult);
+//                System.out.println("Current Player After Move in Computer is : " + state.getCurrentPlayer());
             }
         }
     }
@@ -161,6 +166,9 @@ public class Play {
     private Position getNewPosition(State newState){
         List<Position> positions1 = state.getCurrentPlayerPiecesPositions();
         List<Position> positions2 = newState.getOtherPlayerPiecesPositions();
+//        System.out.println(newState.getOtherPlayer());
+//        System.out.println(state.getCurrentPlayer());
+
 
         Iterator<Position> iterator1 = positions1.iterator();
         while (iterator1.hasNext()) {
@@ -176,6 +184,10 @@ public class Play {
                 }
             }
         }
+
+//        System.out.println(positions1.size());
+//        System.out.println(positions2.size());
+
 
         System.out.println("pawn in (" + (positions1.getFirst().getRow() + 1) + " , " + (positions1.getFirst().getCol() + 1) + ") to ("
         + (positions2.getFirst().getRow() + 1) + " , " + (positions2.getFirst().getCol() + 1) + ")");

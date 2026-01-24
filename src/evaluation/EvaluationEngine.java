@@ -12,7 +12,6 @@ import java.util.List;
 public class EvaluationEngine {
 
     private final State state;
-    private boolean debug;
 
     // أوزان العوامل
     private double W_material;
@@ -31,9 +30,9 @@ public class EvaluationEngine {
     private double totalEvaluation;
 
 
-    public EvaluationEngine(State state, boolean debug){
+    public EvaluationEngine(State state, Difficulty d){
         this.state = state;
-        this.debug = debug;
+        setDifficulty(d);
     }
 
     public void setDifficulty(Difficulty d) {
@@ -69,7 +68,7 @@ public class EvaluationEngine {
             case EXPERT -> {
                 k = 2.0;
                 W_material  = 6 * k;
-                W_progress  = 5 * k;
+                W_progress  = 20 * k;
                 W_position  = 4 * k;
                 W_mobility  = 4 * k;
                 W_capture   = 5 * k;
@@ -78,7 +77,40 @@ public class EvaluationEngine {
         }
     }
 
+    public void printResults(int indent){
 
+        System.out.println("EvaluationEngine {");
+        for (int i = 0 ; i < indent ; i++){
+            System.out.print("\t");
+        }
+        System.out.println("totalMaterialScore = " + totalMaterialScore);
+        for (int i = 0 ; i < indent ; i++){
+            System.out.print("\t");
+        }
+        System.out.println("totalProgressScore = " + totalProgressScore);
+        for (int i = 0 ; i < indent ; i++){
+            System.out.print("\t");
+        }
+        System.out.println("totalPositionScore = " + totalPositionScore);
+        for (int i = 0 ; i < indent ; i++){
+            System.out.print("\t");
+        }
+        System.out.println("totalCaptureScore = " + totalCaptureScore);
+        for (int i = 0 ; i < indent ; i++){
+            System.out.print("\t");
+        }
+        System.out.println("totalMobilityScore = " + totalMobilityScore);
+        for (int i = 0 ; i < indent ; i++){
+            System.out.print("\t");
+        }
+        System.out.println("totalSafetyScore = " + totalSafetyScore);
+        for (int i = 0 ; i < indent - 1 ; i++){
+            System.out.print("\t");
+        }
+        System.out.println("}");
+
+
+    }
     public double eval(){
         List<Position> myPositions = state.getCurrentPlayerPiecesPositions();
         List<Position> opponentPositions = state.getOtherPlayerPiecesPositions();
@@ -93,19 +125,6 @@ public class EvaluationEngine {
         return totalEvaluation;
     }
 
-    @Override
-    public String toString() {
-        return "EvaluationEngine {" +
-                "\n\ttotalMobilityScore = " + totalMobilityScore +
-                "\n\ttotalSafetyScore = " + totalSafetyScore +
-                "\n\ttotalCaptureScore = " + totalCaptureScore +
-                "\n\ttotalPositionScore = " + totalPositionScore +
-                "\n\ttotalProgressScore = " + totalProgressScore +
-                "\n\ttotalMaterialScore = " + totalMaterialScore +
-                "\n\ttotalEvaluation = " + totalEvaluation +
-                "\n}";
-    }
-
     // ------------------- Material -------------------
     private double evaluateFinishedPieces(List<Position> myPositions, List<Position> opponentPositions){
         return (7 - myPositions.size()) * 5 - (7 - opponentPositions.size()) * 5;
@@ -116,6 +135,7 @@ public class EvaluationEngine {
         return calculateProgress(myPositions) - calculateProgress(opponentPositions);
     }
 
+    // ------------------- Position -------------------
     private double calculateProgress(List<Position> positions){
         double score = 0;
         for (Position pos : positions){
@@ -176,7 +196,7 @@ public class EvaluationEngine {
 
     private double calculateMobility(List<Position> positions){
         double score = 0;
-        List<OutComesChances> ocs = OutComesChances.makeStates();
+        List<OutComesChances> ocs = OutComesChances.getThrows();
         Move move = new Move();
 
         for (Position pos : positions){
@@ -197,7 +217,7 @@ public class EvaluationEngine {
 
     private double calculateCaptureScore(List<Position> attackerPositions, List<Position> defenderPositions){
         double score = 0;
-        List<OutComesChances> ocs = OutComesChances.makeStates();
+        List<OutComesChances> ocs = OutComesChances.getThrows();
 
         for (Position pos : attackerPositions){
             for (OutComesChances oc : ocs){
@@ -220,7 +240,7 @@ public class EvaluationEngine {
         double score = 0;
         double directThreat = 0;
 
-        List<OutComesChances> ocs = OutComesChances.makeStates();
+        List<OutComesChances> ocs = OutComesChances.getThrows();
 
         for (Position pos : attackerPositions){
             for (OutComesChances oc : ocs){

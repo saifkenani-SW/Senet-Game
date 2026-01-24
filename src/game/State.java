@@ -199,7 +199,7 @@ public class State {
         return sb.toString();
     }
 
-    private String renderBoard() {
+    public String renderBoard() {
         int rows = 3;
         int cols = 10;
         int cellWidth = 7;
@@ -266,17 +266,5 @@ public class State {
         result = 31 * result + pieceMap.hashCode();
         return result;
     }
-
-    public double eval(Difficulty d, boolean debug){
-        EvaluationEngine engine = new EvaluationEngine(this, debug);
-        engine.setDifficulty(d);
-        double eval = engine.eval();
-        if (debug)
-            System.out.println(engine);
-
-        return eval;
-    }
-
-
 
 }

@@ -13,8 +13,10 @@ public enum Difficulty {
         this.k = k;
     }
 
-    public static Difficulty getDifficultyType(Scanner scanner) {
+    public static Difficulty choseDifficultyType(Scanner scanner) {
         System.out.println("Chose Difficulty :\n1 - Easy\n2 - Normal\n3 - Hard\n4 - Expert");
+        System.out.print("Enter Your Choice : ");
+
         int x = scanner.nextInt();
 
         while (true) {
